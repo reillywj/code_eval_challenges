@@ -7,7 +7,8 @@ module NameComparable
 end
 
 class President
-  attr_reader :file_lines, :number_of_social_issues, :social_issues, :states
+  attr_reader :file_lines, :number_of_social_issues, :social_issues, :states, :min_winners
+  VOTES_TO_WIN = 19
 
   def initialize(filename)
     @filename = filename
@@ -16,9 +17,52 @@ class President
     read_in_file
     organize_info
   end
+  
+  def total_votes(issues)
+    votes_won = 0
+    states.each do |_, state|
+      votes_won += state.votes if state.won?(issues)
+    end
+    votes_won
+  end
+  
+  def won?(issues)
+    total_votes(issues) >= VOTES_TO_WIN
+  end
+  
+  def find_min_number_of_winners
+    num_issues = 1
+    @min_winners = []
+    until !@min_winners.empty? || num_issues >= number_of_social_issues do
+      issue_permutations = social_issues.permutation(num_issues)
+      issue_permutations.each do |set_of_issues|
+        @min_winners << set_of_issues if won?(set_of_issues)
+      end
+      num_issues += 1
+    end
+  end
+  
+  def find_winner
+    find_min_number_of_winners
+    winning_set = find_cheapest_winner
+    winning_set.map(&:name).sort.each {|val| puts val}
+  end
+  
+  def total_cost(set_of_issues)
+    cost = 0
+    set_of_issues.each do |issue|
+      issue_to_add = social_issues.select{|iss| iss == issue}.first
+      cost += issue_to_add.cost
+    end
+    cost
+  end
 
   private
-
+  
+  def find_cheapest_winner
+    @min_winners.sort { |set_a, set_b| total_cost(set_a) <=> total_cost(set_b) }.first
+  end
+  
   def read_in_file
     File.open(@filename).each do |line|
       @file_lines << line.chomp
@@ -68,7 +112,7 @@ class NationalIssue
   attr_reader :name, :cost
   include NameComparable
   
-  def initialize(issue, cost, votes = 0)
+  def initialize(issue, cost = 0)
     @name, @cost = issue, cost
   end
 end
@@ -90,10 +134,25 @@ class State
   def initialize(name)
     @name = name
     @social_issues = []
+    @votes = 0
   end
   
   def <<(social_issue_line) # Format 'Social Issue: votes_count'
     issue, count = social_issue_line.split(': ')
     @social_issues << StateIssue.new(issue, count.to_i)
   end
+  
+  def min_to_win
+    @min_to_win ||= (votes/2 + 1)
+  end
+  
+  def won?(issues)
+    votes_won = 0
+    issues.each do |issue|
+      votes_won += @social_issues.select{|iss| iss == issue}.first.votes if @social_issues.include? issue
+    end
+    votes_won >= min_to_win
+  end
 end
+
+President.new('./example2.txt').find_winner
