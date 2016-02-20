@@ -1,0 +1,64 @@
+Social issues: 10
+
+Healthcare: 76349124
+Immigration: 30303775
+Education: 24435649
+Energy independence: 62652743
+Jobs: 22921592
+Taxes: 44063156
+The environment: 53427057
+Creating jobs: 62635747
+Wealth inequality: 34669773
+Increase military spending: 90777342
+
+Wyoming
+Votes: 3 
+Creating jobs: 0
+Jobs: 0
+Wealth inequality: 1
+Immigration: 0
+Taxes: 0
+The environment: 0
+Healthcare: 0
+Increase military spending: 0
+Education: 0
+Energy independence: 2
+
+Tennessee
+Votes: 11 
+Creating jobs: 1
+Jobs: 2
+Wealth inequality: 1
+Immigration: 2
+Taxes: 1
+The environment: 1
+Healthcare: 1
+Increase military spending: 1
+Education: 1
+Energy independence: 0
+
+Arizona
+Votes: 12 
+Creating jobs: 1
+Jobs: 1
+Wealth inequality: 1
+Immigration: 1
+Taxes: 1
+The environment: 1
+Healthcare: 1
+Increase military spending: 1
+Education: 1
+Energy independence: 3
+
+Wisconsin
+Votes: 10 
+Creating jobs: 1
+Jobs: 1
+Wealth inequality: 1
+Immigration: 1
+Taxes: 1
+The environment: 1
+Healthcare: 1
+Increase military spending: 1
+Education: 1
+Energy independence: 1

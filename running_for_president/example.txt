@@ -1,0 +1,38 @@
+Social issues: 9
+
+Healthcare: 33995797
+Immigration: 2089699
+Education: 37182280
+Energy independence: 1344134
+...
+Wealth inequality: 99237127
+Increase military spending: 44066575
+
+Mississippi
+Votes: 6
+Creating jobs: 1
+Jobs: 0
+...
+Increase military spending: 0
+Education: 1
+Energy independence: 0
+
+Oklahoma
+Votes: 7
+Creating jobs: 1
+Jobs: 2
+...
+Increase military spending: 0
+Education: 1
+Energy independence: 2
+
+...
+
+Maine
+Votes: 4
+Creating jobs: 0
+Jobs: 0
+...
+Increase military spending: 0
+Education: 1
+Energy independence: 3
