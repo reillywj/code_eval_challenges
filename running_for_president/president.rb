@@ -1,5 +1,4 @@
 require 'pry'
-
 module NameComparable
   def ==(other)
     name == other.name
@@ -8,14 +7,14 @@ end
 
 class President
   attr_reader :file_lines, :number_of_social_issues, :social_issues, :states, :min_winners
-  VOTES_TO_WIN = 19
+  VOTES_TO_WIN = 270
 
   def initialize(filename)
     @filename = filename
     @file_lines = []
-    
+    t0 = Time.now
     read_in_file
-    organize_info
+    puts "Reading file: #{Time.now - t0}"
   end
   
   def total_votes(issues)
@@ -34,18 +33,27 @@ class President
     num_issues = 1
     @min_winners = []
     until !@min_winners.empty? || num_issues >= number_of_social_issues do
-      issue_permutations = social_issues.permutation(num_issues)
-      issue_permutations.each do |set_of_issues|
+      issue_combinations = social_issues.combination(num_issues)
+      t0 = Time.now
+      issue_combinations.each do |set_of_issues|
         @min_winners << set_of_issues if won?(set_of_issues)
       end
+      puts "Combination #{num_issues}: #{Time.now - t0}"
       num_issues += 1
     end
+    puts "At min winners size: #{@min_winners.size}"
   end
   
   def find_winner
+    t0 = Time.now
     find_min_number_of_winners
+    puts "Find min number: #{Time.now - t0}"
+    t0 = Time.now
     winning_set = find_cheapest_winner
+    puts "Find cheapest: #{Time.now - t0}"
+    t0 = Time.now
     winning_set.map(&:name).sort.each {|val| puts val}
+    puts "Sort and print: #{Time.now - t0}"
   end
   
   def total_cost(set_of_issues)
@@ -64,47 +72,47 @@ class President
   end
   
   def read_in_file
-    File.open(@filename).each do |line|
-      @file_lines << line.chomp
-    end
-  end
-  
-  def organize_info
-    find_number_of_social_issues
-    find_social_issues
-    find_all_state_info
-  end
-
-  def find_number_of_social_issues
-    @number_of_social_issues = file_lines.shift.split(': ')[-1].to_i
-    file_lines.shift
-  end
-
-  def find_social_issues
+    line_count = 1
+    social_issues_filled_in = false
     @social_issues = []
-    
-    until file_lines.first.empty? do
-      issue, cost = file_lines.shift.split(': ')
-      @social_issues << NationalIssue.new(issue, cost.to_i)
-    end
-    file_lines.shift
-  end
-  
-  def find_all_state_info
     @states = {}
-    until file_lines.empty? do
-      find_next_state_info
+    state_line_count = 1
+    current_state_name = ''
+    
+    File.open(@filename).each do |line|
+      @number_of_social_issues = line.chomp.split(': ')[-1].to_i if line_count == 1
+      
+      if line_count >= 3
+        if social_issues_filled_in
+          if line.chomp.empty?
+            state_line_count = 1
+          else
+            case state_line_count
+            when 1
+              # State name
+              current_state_name = line.chomp
+              @states[current_state_name] = State.new(current_state_name)
+            when 2
+              # State votes
+              @states[current_state_name].votes = line.chomp.split(': ')[1].to_i
+            else
+              # State issues
+              @states[current_state_name] << line.chomp
+            end
+            state_line_count += 1
+          end
+        else
+          if line.chomp.empty?
+            social_issues_filled_in = true
+          else
+            issue, cost = line.chomp.split(': ')
+            @social_issues << NationalIssue.new(issue, cost.to_i)
+          end
+        end
+      end
+      
+      line_count += 1
     end
-  end
-  
-  def find_next_state_info
-    state = State.new(file_lines.shift)
-    state.votes = file_lines.shift.split(': ')[1].to_i
-    until file_lines.empty? || file_lines.first.empty? do
-      state << file_lines.shift
-    end
-    file_lines.shift unless file_lines.empty?
-    @states[state.name] = state
   end
 end
 
@@ -150,9 +158,12 @@ class State
     votes_won = 0
     issues.each do |issue|
       votes_won += @social_issues.select{|iss| iss == issue}.first.votes if @social_issues.include? issue
+      break if votes_won >= min_to_win
     end
     votes_won >= min_to_win
   end
 end
 
-President.new('./example2.txt').find_winner
+t0 = Time.now
+President.new('./sample_3.txt').find_winner
+puts Time.now - t0
