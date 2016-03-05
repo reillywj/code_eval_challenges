@@ -1,3 +1,5 @@
+require 'pry'
+
 class UserInteractions
   def initialize(filename)
     lines = IO.readlines(filename).map(&:chomp)
@@ -27,9 +29,9 @@ class UserInteractions
 
   def find_interactions(lines)
     lines.each do |line|
-      split_line = line.split(/\s{4}/)
-      @interactions[split_line[1]] = [] unless @interactions[split_line[1]]
-      @interactions[split_line[1]] << split_line[2]  
+      split_line = line.split(/\s{1,}/)
+      @interactions[split_line[-2]] = [] unless @interactions[split_line[-2]]
+      @interactions[split_line[-2]] << split_line[-1]  
     end
     unique_interactions
   end
@@ -55,7 +57,7 @@ class Clusters
   end
 
   def formatted_print
-    sort_clusters
+    sort_clusters.reject { |cluster| cluster.size < 3 }
   end
 
   private
@@ -64,8 +66,6 @@ class Clusters
     @clusters = []
     @relationships.each do |sender, receivers|
       receivers.size.times do |index|
-        puts "Sender: #{sender}"
-
         receivers.permutation(index + 1).to_a.each do |perm|
           @clusters << Cluster.new([sender, perm].flatten) if all_mutual?(sender, perm)
         end
@@ -75,7 +75,7 @@ class Clusters
   end
 
   def mutual?(sender, receiver)
-    @relationships[receiver].include? sender
+    @relationships[receiver].include? sender if @relationships[receiver]
   end
 
   def all_mutual?(sender, receivers)
@@ -91,12 +91,13 @@ class Clusters
     copy_of_clusters = @clusters.map.to_a
     copy_of_clusters.each do |cluster|
       @clusters.delete(cluster) if is_sub_cluster?(cluster)
+      puts "Deleted: #{cluster}"
     end
   end
 
   def is_sub_cluster?(test_cluster)
     is_sub_cluster = false
-    clusters_plus_1 = @clusters.select { |cluster| cluster.size == test_cluster.size + 1 }
+    clusters_plus_1 = @clusters.select { |cluster| cluster.size > test_cluster.size }
     clusters_plus_1.each do |cluster|
       is_sub_cluster = (test_cluster - cluster).empty?
       break if is_sub_cluster
@@ -105,7 +106,7 @@ class Clusters
   end
 
   def sort_clusters
-    @clusters.sort
+    @clusters.sort!
   end
 end
 
@@ -125,11 +126,7 @@ class Cluster
   end
 
   def <=>(other)
-    if size == other.size
-      to_s <=> other.to_s
-    else
-      size <=> other.size
-    end
+    to_s <=> other.to_s
   end
 
   def to_s
@@ -137,25 +134,11 @@ class Cluster
   end
 end
 
-user_interactions = UserInteractions.new('input.txt')
-# puts user_interactions
-# p user_interactions['a@facebook.com']
+# filename = 'input.txt'
+filename = 'input_2.txt'
+
+user_interactions = UserInteractions.new(filename)
 
 clusters = Clusters.new(user_interactions)
-clusters.clusters.each do |cluster|
-  puts cluster
-end
 
-clusters.formatted_print
-
-
-
-
-
-
-
-
-
-
-
-
+puts clusters.formatted_print
