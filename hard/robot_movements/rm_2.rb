@@ -12,7 +12,6 @@ class RobotMovements
   def find_all_paths
     count = 0
     until all_paths_done? || count > 50000
-      p paths
       # solve for paths
       @paths = paths.map do |path|
         if path.reached_destination?
@@ -98,8 +97,6 @@ class Path
   end
 
   def increment_step(step, row_add, column_add)
-    p step
-    p self if step.size >= 3
     [step[0] + row_add, step[1] + column_add]
   end
   
