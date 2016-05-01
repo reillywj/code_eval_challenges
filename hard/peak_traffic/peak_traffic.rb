@@ -91,7 +91,6 @@ class Clusters
     copy_of_clusters = @clusters.map.to_a
     copy_of_clusters.each do |cluster|
       @clusters.delete(cluster) if is_sub_cluster?(cluster)
-      puts "Deleted: #{cluster}"
     end
   end
 
