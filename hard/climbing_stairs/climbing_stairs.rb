@@ -3,14 +3,12 @@
 class ClimbingStairs
   def self.possibilities(number_of_steps)
     paths = [Path.new(number_of_steps)]
-    until finished? paths
-      paths = paths.map { |path| path.step_up }.flatten
-    end
+    paths = paths.map(&:step_up).flatten until finished? paths
     paths.size
   end
 
   def self.finished?(paths)
-    paths.all? { |path| path.finished? }
+    paths.all?(&:finished?)
   end
 end
 
@@ -40,7 +38,7 @@ class Path
   end
 
   private
-  
+
   def add_step(num)
     @steps + [num]
   end
